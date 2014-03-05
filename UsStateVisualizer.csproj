@@ -11,6 +11,7 @@
     <RootNamespace>UsStateVisualizer</RootNamespace>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
     <AssemblyName>UsStateVisualizer</AssemblyName>
+    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,12 +67,42 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac" />
+    <Reference Include="SharpMap">
+      <HintPath>bin\Debug\SharpMap.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite">
+      <HintPath>bin\Debug\NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="GeoAPI">
+      <HintPath>bin\Debug\GeoAPI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Resources\us states shapefile\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">
+      <Link>Resources\us states shapefile\.DS_Store</Link>
+    </BundleResource>
+    <BundleResource Include="..\..\..\Datasets\us states shapefile\usa_state_shapefile.README">
+      <Link>Resources\us states shapefile\usa_state_shapefile.README</Link>
+    </BundleResource>
+    <BundleResource Include="..\..\..\Datasets\us states shapefile\usa_state_shapefile.dbf">
+      <Link>Resources\us states shapefile\usa_state_shapefile.dbf</Link>
+    </BundleResource>
+    <BundleResource Include="..\..\..\Datasets\us states shapefile\usa_state_shapefile.shp">
+      <Link>Resources\us states shapefile\usa_state_shapefile.shp</Link>
+    </BundleResource>
+    <BundleResource Include="..\..\..\Datasets\us states shapefile\usa_state_shapefile.shx">
+      <Link>Resources\us states shapefile\usa_state_shapefile.shx</Link>
+    </BundleResource>
+  </ItemGroup>
 </Project>
