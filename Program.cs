@@ -2,6 +2,8 @@
 using SharpMap.Data.Providers;
 using NetTopologySuite;
 using GeoAPI;
+using GeoAPI.Geometries;
+using System.Collections.ObjectModel;
 
 namespace UsStateVisualizer
 {
@@ -18,7 +20,25 @@ namespace UsStateVisualizer
 			using (ShapeFile shapefile = new ShapeFile (shpFileName)) {
 				shapefile.Open ();
 
-				Console.WriteLine (shapefile.ToString ());
+				Envelope bbox = shapefile.GetExtents ();
+
+				Collection<IGeometry> geometries = shapefile.GetGeometriesInView (bbox);
+
+				Console.WriteLine ("Shapefile:");
+
+
+				foreach (IGeometry geometry in geometries) {
+					// Shape
+					var coords = geometry.Coordinates;
+					Console.WriteLine ("Next coordinate set:");
+
+					foreach (Coordinate coord in coords){
+
+						Console.WriteLine (coord.ToString());
+					}
+				}
+
+				Console.WriteLine ("");
 			}
 
 			Console.WriteLine("Press any key to continue...");

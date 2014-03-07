@@ -76,6 +76,9 @@
     <Reference Include="GeoAPI">
       <HintPath>bin\Debug\GeoAPI.dll</HintPath>
     </Reference>
+    <Reference Include="SharpVectors.Core">
+      <HintPath>..\..\..\Downloads\Converter1.0\SharpVectors.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -87,6 +90,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="SvgPolygon.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">
