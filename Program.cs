@@ -72,27 +72,26 @@ namespace UsStateVisualizer
 					viewBoxAttr.Value = string.Format ("{0:F1} {1:F1} {2:F1} {3:F1}" , bbox.Left (), -bbox.Top (), bbox.Width, bbox.Height);
 					svgElement.Attributes.Append(viewBoxAttr);
 
+					// state style - determined by metric
+					string stateRegionStyle = "fill:#800080;stroke:#C0C0C0;stroke-width:0.1";
+
+
+
+					var states = geometries.Select ((geometry, iState) => new PoliticalRegion (geometries.ElementAt ((int)iState)
+						, stateRegionStyle //, "", ""));
+						,(string)((object[])db.GetValues ((uint)iState))[1]
+						,(string)((object[])db.GetValues ((uint)iState))[5] ) );
+
+					//states.Select( state => state.AddPolygonToSvg(svgElement, htmlDoc ) );
 
 					// Create states 	
-					for (uint iState = 0; iState < geometries.Count; iState++) {
+					foreach (PoliticalRegion state in states) {
 
-						//string stateName = db.GetValues (iState).Get (1); 
-						//string stateCode = db.GetValues (iState).Get (5);
-//						string stateName = "My State";
-//						var stateElement = htmlDoc.CreateElement("State");
-//						var stateNameAttr = htmlDoc.CreateAttribute("name");
-//						stateNameAttr.Value = stateName;
-//						stateElement.Attributes.Append (stateNameAttr);
-
-						// state style - determined by metric
-						string stateRegionStyle = "fill:#800080;stroke:#C0C0C0;stroke-width:0.1";
-
-						PoliticalRegion state = new PoliticalRegion(geometries.ElementAt ((int)iState)
-							,stateRegionStyle);
-
+////						string stateName = "My State";
+//
 						state.AddPolygonToSvg (svgElement, htmlDoc);
-//						svgElement.AppendChild (whiteSpace);
-//						svgElement.AppendChild (stateElement);
+////						svgElement.AppendChild (whiteSpace);
+////						svgElement.AppendChild (stateElement);
 					}
 
 //					foreach (var geometry in geometries) {

@@ -10,14 +10,27 @@ namespace UsStateVisualizer
 	{
 		public readonly IGeometry Geometry;
 		public readonly string StyleSpec;
+		public readonly string Name;
+		public readonly string Code;
 
-		public PoliticalRegion (IGeometry geometry, string style)
+		public PoliticalRegion (IGeometry geometry, string style, string name, string code)
 		{
 			Geometry = geometry;
 			StyleSpec = style;
+			Name = name;
+			Code = code;
 		}
 
 		public void AddPolygonToSvg( XmlElement svgElement, XmlDocument htmlDoc ){
+
+			XmlElement regionElement = htmlDoc.CreateElement ("g");
+
+			var regionNameAttr = htmlDoc.CreateAttribute("name");
+			regionNameAttr.Value = Name;
+			regionElement.Attributes.Append (regionNameAttr);
+			var regionClassAttr = htmlDoc.CreateAttribute ("class");
+			regionClassAttr.Value = "PoliticalRegion";
+			regionElement.Attributes.Append (regionClassAttr);
 
 			// Shape
 			for (int iSubRegion = 0; iSubRegion < Geometry.NumGeometries; iSubRegion += 1) {
@@ -40,10 +53,14 @@ namespace UsStateVisualizer
 				subRegionNode.Attributes.Append(styleAttr);
 
 				// Add state polygon, text to list 
-				svgElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
-				svgElement.AppendChild (subRegionNode);
+				regionElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
+				regionElement.AppendChild (subRegionNode);
 
 			}
+			// Add state polygon, text to list 
+			svgElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
+			svgElement.AppendChild (regionElement);
+
 		}
 	
 	}
