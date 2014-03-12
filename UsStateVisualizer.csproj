@@ -90,6 +90,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="PoliticalRegion.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">

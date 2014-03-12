@@ -42,8 +42,6 @@ namespace UsStateVisualizer
 			svgName.Value = "Geographical Region Statistic Map";
 			svgElement.Attributes.Append (svgName);
 
-			var whiteSpace = htmlDoc.CreateWhitespace ("\n");
-
 			// Attributes independent of data.
 			var heightAttr = htmlDoc.CreateAttribute ("height");
 			heightAttr.Value = "100%";
@@ -54,8 +52,9 @@ namespace UsStateVisualizer
 
 			// TODO: Use css/jquery-style formatting?
 			//new Style
-			XmlNode svgColorAttr = htmlDoc.CreateAttribute ("style");
+			var svgColorAttr = htmlDoc.CreateAttribute ("style");
 			svgColorAttr.Value = "background:black";
+			svgElement.Attributes.Append (svgColorAttr);
 
 
 			using (ShapeFile shapefile = new ShapeFile (shpFileName)) {
@@ -76,9 +75,8 @@ namespace UsStateVisualizer
 
 					// Create states 	
 					for (uint iState = 0; iState < geometries.Count; iState++) {
-						IGeometry geometry = geometries.ElementAt ((int)iState);
 
-//						string stateName = db.GetValues (iState).Get (1); 
+						//string stateName = db.GetValues (iState).Get (1); 
 						//string stateCode = db.GetValues (iState).Get (5);
 //						string stateName = "My State";
 //						var stateElement = htmlDoc.CreateElement("State");
@@ -89,31 +87,10 @@ namespace UsStateVisualizer
 						// state style - determined by metric
 						string stateRegionStyle = "fill:#800080;stroke:#C0C0C0;stroke-width:0.1";
 
-						// Shape
-						for (int iSubRegion = 0; iSubRegion < geometry.NumGeometries; iSubRegion += 1) {
-							var subRegionNode = htmlDoc.CreateElement ("polygon");
-							//var subregionNameAttr = htmlDoc.CreateAttribute ("description");
-							//subregionNameAttr.Value = stateElement.GetType () + " region " + iSubRegion.ToString ();
+						PoliticalRegion state = new PoliticalRegion(geometries.ElementAt ((int)iState)
+							,stateRegionStyle);
 
-							// Define subregion border.
-							var subRegion = geometry.GetGeometryN (iSubRegion);
-							var coords = subRegion.Coordinates;	
-							var coordStrings = coords.Select (coord => string.Format ("{0:F2},{1:F2} ", coord.X, -coord.Y));
-							string coordString = coordStrings.Aggregate ((coordStringBase, coordStringNext) => coordStringBase + coordStringNext);
-							var pointsAttr = htmlDoc.CreateAttribute ("points");
-							pointsAttr.Value = coordString;
-							subRegionNode.Attributes.Append(pointsAttr);
-
-							// Color/Style spec.
-							var styleAttr = htmlDoc.CreateAttribute ("style");
-							styleAttr.Value = stateRegionStyle;
-							subRegionNode.Attributes.Append(styleAttr);
-
-							// Add state polygon, text to list 
-							svgElement.AppendChild (whiteSpace);
-							svgElement.AppendChild (subRegionNode);
-
-						}
+						state.AddPolygonToSvg (svgElement, htmlDoc);
 //						svgElement.AppendChild (whiteSpace);
 //						svgElement.AppendChild (stateElement);
 					}
@@ -129,12 +106,15 @@ namespace UsStateVisualizer
 //						//svgPolygonList.Add (titleStringHtml);
 //					}
 
-					bodyElement.AppendChild (whiteSpace);
+					bodyElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 					bodyElement.AppendChild (svgElement);
+					bodyElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 
 					htmlDocElement.AppendChild (bodyElement);
+					htmlDocElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 
 					htmlDoc.AppendChild (htmlDocElement);
+					htmlDoc.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 
 					using (var stringWriter = new StringWriter ())
 					using (var xmlTextWriter = XmlWriter.Create (stringWriter)) {
@@ -148,9 +128,6 @@ namespace UsStateVisualizer
 				}
 			}
 
-			Console.WriteLine ("Press any key to continue...");
-			Console.ReadKey ();
-			Console.ReadKey ();
 		}
 	}
 }
