@@ -12,14 +12,23 @@ namespace UsStateVisualizer
 {
 	public class Program
 	{
+		// Borders 
+		static public string DataDirectory = "/Users/jasonstewart/Dropbox/electioneering/data/boarders";
+
+		//Election results
+		static public string electionResultsFile = "/Users/jasonstewart/Datasets/election results/2012congresults.xls";
+
 		public static void Main (string[] args)
 		{
-			string DataDirectory = "/Users/jasonstewart/Dropbox/electioneering/data/boarders";
 			string shpFileName = DataDirectory + "/states.shp";
 			string dbfFileName = DataDirectory + "/states.dbf";
 
 			//html/Xml handler
 			var builder = new SvgXmlBuilder ();
+
+			// Excel shit
+			var excelFileReaderFactor = new ExcelRegionInfoReader<long> (electionResultsFile);
+			excelFileReaderFactor.ReadInfo ();
 
 			// Region map info
 			var regionBuilder = new PoliticalMapBuilder (shpFileName, dbfFileName);
@@ -34,6 +43,8 @@ namespace UsStateVisualizer
 			IEnumerable<PoliticalRegion> states = regionBuilder.CreateRegionInfo ();
 			Action<PoliticalRegion> addState = state => state.AddPolygonToSvg (builder.SvgElement, builder.HtmlDoc);
 			states.ToList ().ForEach (addState);
+
+			// Get state
 
 			// Close-out elements. Ideally, we wouldn't [have to?] do this.
 			builder.FinishDocument ();

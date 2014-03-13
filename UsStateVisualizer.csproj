@@ -79,6 +79,10 @@
     <Reference Include="SharpVectors.Core">
       <HintPath>..\..\..\dlls\Converter1.0\SharpVectors.Core.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="Excel">
+      <HintPath>..\..\..\dlls\2.1.beta.binary\Excel.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -93,6 +97,7 @@
     <Compile Include="PoliticalRegion.cs" />
     <Compile Include="SvgXmlBuilder.cs" />
     <Compile Include="PoliticalMapBuilder.cs" />
+    <Compile Include="ExcelRegionInfoReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">
