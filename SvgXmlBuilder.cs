@@ -11,12 +11,16 @@ namespace UsStateVisualizer
 		private XmlElement bodyElement;
 		private XmlElement htmlDocElement;
 
+		// Provides methods for structuring xml to produce an Svg (nested in an HTML doc).
 		public SvgXmlBuilder ()
 		{
 			HtmlDoc = new XmlDocument ();
 
+			// HTML-level
+			HtmlDoc.AppendChild (HtmlDoc.CreateDocumentType ("html", "", "", ""));
 			htmlDocElement = HtmlDoc.CreateElement ("html");
 
+			// Body-level
 			bodyElement = HtmlDoc.CreateElement ("body");
 			htmlDocElement.AppendChild (bodyElement);
 
@@ -53,6 +57,7 @@ namespace UsStateVisualizer
 			HtmlDoc.AppendChild (htmlDocElement);
 			HtmlDoc.AppendChild (HtmlDoc.CreateWhitespace ("\n"));
 		}
+
 	}
 }
 

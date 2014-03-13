@@ -13,6 +13,7 @@ namespace UsStateVisualizer
 		public readonly string Name;
 		public readonly string Code;
 
+		// Represents some geographical region
 		public PoliticalRegion (IGeometry geometry, string style, string name, string code)
 		{
 			Geometry = geometry;
@@ -35,8 +36,6 @@ namespace UsStateVisualizer
 			// Shape
 			for (int iSubRegion = 0; iSubRegion < Geometry.NumGeometries; iSubRegion += 1) {
 				var subRegionNode = htmlDoc.CreateElement ("polygon");
-				//var subregionNameAttr = htmlDoc.CreateAttribute ("description");
-				//subregionNameAttr.Value = stateElement.GetType () + " region " + iSubRegion.ToString ();
 
 				// Define subregion border.
 				var subRegion = Geometry.GetGeometryN (iSubRegion);
@@ -61,6 +60,21 @@ namespace UsStateVisualizer
 			svgElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 			svgElement.AppendChild (regionElement);
 
+		}
+
+		public static void AddTextToSvg(PoliticalRegion region, XmlElement svgEl, XmlElement htmlDoc ){
+
+
+			//					foreach (var geometry in geometries) {
+			//						// title string, middle of polygon
+			//						var stateCoords = geometry.Coordinates;
+			//						double xAverage = stateCoords.Average (coord => coord.X);
+			//						double yAverage = stateCoords.Average (coord => coord.Y);
+			//						string titleStringHtml = string.Format ("<text x=\"{0}\" y=\"{1}\" "
+			//						                        + "style=\"font-size:2px\">" +
+			//						                        "State number XX</text>", xAverage, -yAverage);
+			//						//svgPolygonList.Add (titleStringHtml);
+			//					}
 		}
 	
 	}
