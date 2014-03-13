@@ -5,9 +5,11 @@ using System.Linq;
 using GeoAPI;
 using GeoAPI.Geometries;
 using System.Collections.ObjectModel;
-using SharpVectors.Dom.Svg;
+using System.Collections;
+using System.Collections.Generic;
 using System.Xml;
 using System.IO;
+using SharpVectors.Dom.Svg;
 
 namespace UsStateVisualizer
 {
@@ -27,72 +29,65 @@ namespace UsStateVisualizer
 			//int svgWidth = 100;
 
 			//html Doc
-			XmlDocument htmlDoc = new XmlDocument ();
-			htmlDoc.AppendChild( htmlDoc.CreateDocumentType ("html","","","") );
+			var builder = new SvgXmlBuilder ();
 
-			var htmlDocElement = htmlDoc.CreateElement ("html");
-
-			var bodyElement = htmlDoc.CreateElement ("body");
-			htmlDocElement.AppendChild (bodyElement);
-
-			// svg document
-			var svgElement = htmlDoc.CreateElement ("svg");
-			bodyElement.AppendChild (svgElement);
-			var svgName = htmlDoc.CreateAttribute ("name");
-			svgName.Value = "Geographical Region Statistic Map";
-			svgElement.Attributes.Append (svgName);
-
-			// Attributes independent of data.
-			var heightAttr = htmlDoc.CreateAttribute ("height");
-			heightAttr.Value = "100%";
-			var widthAttr = htmlDoc.CreateAttribute ("width");
-			widthAttr.Value = "100%";
-			svgElement.Attributes.Append(heightAttr);
-			svgElement.Attributes.Append(widthAttr);
-
-			// TODO: Use css/jquery-style formatting?
-			//new Style
-			var svgColorAttr = htmlDoc.CreateAttribute ("style");
-			svgColorAttr.Value = "background:black";
-			svgElement.Attributes.Append (svgColorAttr);
+			builder.HtmlDoc.AppendChild (builder.HtmlDoc.CreateDocumentType ("html", "", "", ""));
 
 
+			Collection<IGeometry> stateBorders;
+			Envelope bbox;
 			using (ShapeFile shapefile = new ShapeFile (shpFileName)) {
 				shapefile.Open ();
 
-				using (DbaseReader db = new DbaseReader (dbfFileName)) {
-					db.Open ();
-					// Set attributes for SVG.
+				// Get extents, assign to svg "viewbox" attribute.
+				bbox = shapefile.GetExtents ();
+				stateBorders = shapefile.GetGeometriesInView (bbox);
 
-					// Get extents, assign to svg "viewbox" attribute.
-					Envelope bbox = shapefile.GetExtents ();
-					Collection<IGeometry> geometries = shapefile.GetGeometriesInView (bbox);
-					// 
-					var viewBoxAttr = htmlDoc.CreateAttribute( "viewbox" );
-					viewBoxAttr.Value = string.Format ("{0:F1} {1:F1} {2:F1} {3:F1}" , bbox.Left (), -bbox.Top (), bbox.Width, bbox.Height);
-					svgElement.Attributes.Append(viewBoxAttr);
-
-					// state style - determined by metric
-					string stateRegionStyle = "fill:#800080;stroke:#C0C0C0;stroke-width:0.1";
+				shapefile.Close ();
+			}
 
 
+			// Generate Tuple (ideally struct), containing names and codes.
+			List<Tuple<string,string>> nameAndCode;
+			using (DbaseReader db = new DbaseReader (dbfFileName)) {
+				db.Open ();
 
-					var states = geometries.Select ((geometry, iState) => new PoliticalRegion (geometries.ElementAt ((int)iState)
-						, stateRegionStyle //, "", ""));
-						,(string)((object[])db.GetValues ((uint)iState))[1]
-						,(string)((object[])db.GetValues ((uint)iState))[5] ) );
+				int start = 0;
+				int count = stateBorders.Count ();
+				var regionIdx = Enumerable.Range (start,count);
 
-					//states.Select( state => state.AddPolygonToSvg(svgElement, htmlDoc ) );
+				// struct would look nicer here.
+				nameAndCode = regionIdx.Select (iRegion => Tuple.Create (
+					(string)((object[])db.GetValues ((uint)iRegion)) [1],
+					(string)((object[])db.GetValues ((uint)iRegion)) [5]
+				)).ToList();
+				db.Close ();
+			}
+			
+			// state style - determined by metric
+			string stateRegionStyle = "fill:#800080;stroke:#C0C0C0;stroke-width:0.1";
 
-					// Create states 	
-					foreach (PoliticalRegion state in states) {
+			var states = stateBorders.Zip (nameAndCode,
+				             (geometry, nameAndCodeTuple) => new PoliticalRegion (
+					             geometry,
+					             stateRegionStyle,
+					             nameAndCodeTuple.Item1,
+					             nameAndCodeTuple.Item2)
+			             );
 
-////						string stateName = "My State";
-//
-						state.AddPolygonToSvg (svgElement, htmlDoc);
-////						svgElement.AppendChild (whiteSpace);
-////						svgElement.AppendChild (stateElement);
-					}
+			// 
+			var viewBoxAttr = builder.HtmlDoc.CreateAttribute ("viewbox");
+			viewBoxAttr.Value = string.Format ("{0:F1} {1:F1} {2:F1} {3:F1}", bbox.Left (), -bbox.Top (), bbox.Width, bbox.Height);
+			builder.SvgElement.Attributes.Append (viewBoxAttr);
+
+ 
+
+			// Create states 	
+			foreach (PoliticalRegion state in states) {
+				// This syntax would be preferable: states.Select( state => state.AddPolygonToSvg(svgElement, builder.HtmlDoc ) );
+				state.AddPolygonToSvg (builder.SvgElement, builder.HtmlDoc);
+
+			}
 
 //					foreach (var geometry in geometries) {
 //						// title string, middle of polygon
@@ -105,26 +100,18 @@ namespace UsStateVisualizer
 //						//svgPolygonList.Add (titleStringHtml);
 //					}
 
-					bodyElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
-					bodyElement.AppendChild (svgElement);
-					bodyElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
+			builder.FinishDocument ();
 
-					htmlDocElement.AppendChild (bodyElement);
-					htmlDocElement.AppendChild (htmlDoc.CreateWhitespace ("\n"));
+			using (var stringWriter = new StringWriter ())
+			using (var xmlTextWriter = XmlWriter.Create (stringWriter)) {
+				builder.HtmlDoc.WriteTo (xmlTextWriter);
+				xmlTextWriter.Flush ();
+				System.IO.File.WriteAllText (@"/Users/jasonstewart/Projects/UsStateVisualizer/output/usStates.html", 
+					stringWriter.GetStringBuilder ().ToString ());
 
-					htmlDoc.AppendChild (htmlDocElement);
-					htmlDoc.AppendChild (htmlDoc.CreateWhitespace ("\n"));
 
-					using (var stringWriter = new StringWriter ())
-					using (var xmlTextWriter = XmlWriter.Create (stringWriter)) {
-						htmlDoc.WriteTo(xmlTextWriter);
-						xmlTextWriter.Flush();
-						System.IO.File.WriteAllText (@"/Users/jasonstewart/Projects/UsStateVisualizer/output/usStates.html", 
-							stringWriter.GetStringBuilder().ToString());
-
-					}
 				
-				}
+
 			}
 
 		}

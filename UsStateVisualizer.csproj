@@ -91,6 +91,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="PoliticalRegion.cs" />
+    <Compile Include="SvgXmlBuilder.cs" />
+    <Compile Include="PoliticalMapBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">
