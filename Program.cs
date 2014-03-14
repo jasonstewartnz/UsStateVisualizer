@@ -16,7 +16,7 @@ namespace UsStateVisualizer
 		static public string DataDirectory = "/Users/jasonstewart/Dropbox/electioneering/data/boarders";
 
 		//Election results
-		static public string electionResultsFile = "/Users/jasonstewart/Datasets/election results/2012congresults.xls";
+		static public string electionResultsFile = "/Users/jasonstewart/Datasets/election results/2012congresults/Table 7. House by Party-Table 1.csv";
 
 		public static void Main (string[] args)
 		{
@@ -27,7 +27,7 @@ namespace UsStateVisualizer
 			var builder = new SvgXmlBuilder ();
 
 			// Excel shit
-			var excelFileReaderFactor = new ExcelRegionInfoReader<long> (electionResultsFile);
+			var excelFileReaderFactor = new CsvRegionInfoReader<long> (electionResultsFile);
 			excelFileReaderFactor.ReadInfo ();
 
 			// Region map info

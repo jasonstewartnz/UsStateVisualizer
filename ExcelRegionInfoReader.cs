@@ -24,7 +24,8 @@ namespace UsStateVisualizer
 			using(FileStream stream = File.Open(FileName, FileMode.Open, FileAccess.Read)){
 
 			//1. Reading from a binary Excel file ('97-2003 format; *.xls)
-			IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+				IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+				excelReader.Initialize (stream);
 			//...
 			//2. Reading from a OpenXml Excel file (2007 format; *.xlsx)
 				//IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);

@@ -98,6 +98,7 @@
     <Compile Include="SvgXmlBuilder.cs" />
     <Compile Include="PoliticalMapBuilder.cs" />
     <Compile Include="ExcelRegionInfoReader.cs" />
+    <Compile Include="CsvRegionInfoReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="..\..\..\Datasets\us states shapefile\.DS_Store">
