@@ -27,8 +27,8 @@ namespace UsStateVisualizer
 			var builder = new SvgXmlBuilder ();
 
 			// Excel shit
-			var excelFileReaderFactor = new CsvRegionInfoReader<long> (electionResultsFile);
-			excelFileReaderFactor.ReadInfo ();
+			var stateInfoReader = new CsvRegionInfoReader<long> (electionResultsFile);
+			var stateInfo = stateInfoReader.ReadInfo ();
 
 			// Region map info
 			var regionBuilder = new PoliticalMapBuilder (shpFileName, dbfFileName);
